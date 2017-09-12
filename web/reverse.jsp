@@ -30,7 +30,7 @@
     boolean sizeFlag = (null == respSize || "".equalsIgnoreCase(respSize));
 
     byte[] bytes = null;
-    int len = 0;
+    int len;
 
     if (!sizeFlag) {
         len = Integer.valueOf(respSize);
@@ -39,7 +39,13 @@
         InputStream inputStream = request.getInputStream();
         bytes = new byte[4 * 1024];
         len = inputStream.read(bytes);
+
+        /* 避免不传size并且请求体为空时,len赋值为-1 */
+        if (-1 == len) {
+            len = 0;
+        }
     }
+
     OutputStream os = response.getOutputStream();
     os.write(bytes, 0, len);
     os.flush();
